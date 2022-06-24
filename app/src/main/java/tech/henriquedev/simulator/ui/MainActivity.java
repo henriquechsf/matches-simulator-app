@@ -1,13 +1,23 @@
 package tech.henriquedev.simulator.ui;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.snackbar.Snackbar;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import tech.henriquedev.simulator.R;
 import tech.henriquedev.simulator.databinding.ActivityMainBinding;
+import tech.henriquedev.simulator.domain.Match;
 import tech.henriquedev.simulator.domain.Team;
 import tech.henriquedev.simulator.domain.data.MatchesAPI;
 
@@ -31,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupHttpClient() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:3000/matches")
+                .baseUrl("http://10.0.2.2:3000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -39,7 +49,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupFloatingActionButton() {
-        // TODO: Criar evento de clique e simulacao de partidas
+        matchesApi.getMatches().enqueue(new Callback<List<Match>>() {
+            @Override
+            public void onResponse(Call<List<Match>> call, Response<List<Match>> response) {
+                if (response.isSuccessful()) {
+                    List<Match> matches = response.body();
+                    Log.i("SIMULADOR", "Deu tudo certo! Voltaram partidas. Partidas: " + matches.size());
+                } else {
+                    showErrorMessage();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Match>> call, Throwable t) {
+                showErrorMessage();
+            }
+        });
     }
 
     private void setupMatchesRefresh() {
@@ -48,5 +73,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupMatchesList() {
         // TODO: Listar as partidas consumindo a nossa API
+    }
+
+    private void showErrorMessage() {
+        Snackbar.make(binding.getRoot(), R.string.error_api, Snackbar.LENGTH_LONG).show();
     }
 }
