@@ -23,6 +23,7 @@
         </activity>
         <activity
             android:name=".ui.DetailActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Simulator.NoActionBar"
             android:exported="false"/>
     </application>
