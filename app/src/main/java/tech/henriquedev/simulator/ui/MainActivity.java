@@ -57,12 +57,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupMatchesRefresh() {
-        // TODO: Atualizar as partidas na acao de swipe
+        binding.srlMatches.setOnRefreshListener(this::findMatchesFromApi);
     }
 
     private void setupMatchesList() {
         binding.rvMatches.setHasFixedSize(true);
         binding.rvMatches.setLayoutManager(new LinearLayoutManager(this));
+
+        findMatchesFromApi();
+    }
+
+    private void findMatchesFromApi() {
+        binding.srlMatches.setRefreshing(true);
 
         matchesApi.getMatches().enqueue(new Callback<List<Match>>() {
             @Override
@@ -74,11 +80,13 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     showErrorMessage();
                 }
+                binding.srlMatches.setRefreshing(false);
             }
 
             @Override
             public void onFailure(Call<List<Match>> call, Throwable t) {
                 showErrorMessage();
+                binding.srlMatches.setRefreshing(false);
             }
         });
     }
